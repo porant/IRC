@@ -22,7 +22,7 @@ services:
   # Web-based IRC client: Kiwi IRC
   kiwiirc:
     image: itzg/kiwi-irc:latest           # official Kiwi IRC image
-    user: "node"                          # run as non-root, matches file ownership
+
     ports:
       - "7778:7778"                       # publish Kiwi’s web UI port
     volumes:
@@ -39,10 +39,6 @@ services:
       - dokploy-network
 
 networks:
-  # Dokploy will auto-create and attach this external network
-  dokploy-network:
-    external: true
+      - dokploy-network
 
 volumes:
-  ircd-data:
-  lounge-data:
