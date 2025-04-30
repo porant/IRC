@@ -22,7 +22,7 @@ services:
   # Web-based IRC client: Kiwi IRC
   kiwiirc:
     image: itzg/kiwi-irc:latest           # official Kiwi IRC image
-
+    
     ports:
       - "7778:7778"                       # publish Kiwi’s web UI port
     volumes:
@@ -39,6 +39,9 @@ services:
       - dokploy-network
 
 networks:
-      - dokploy-network
+  # Dokploy will auto-create and attach this external network
+  dokploy-network:
+    external: true
 
 volumes:
+  ircd-data:
