@@ -19,22 +19,22 @@ services:
     networks:
       - dokploy-network
 
-  # Web-based IRC client: The Lounge
-  thelounge:
-    image: ghcr.io/thelounge/thelounge:latest
-    depends_on:
-      - ircd
+  # Web-based IRC client: Kiwi IRC
+  kiwiirc:
+    image: itzg/kiwi-irc:latest           # official Kiwi IRC image
+    user: "node"                          # run as non-root, matches file ownership
     ports:
-      - "9000:9000"
+      - "7778:7778"                       # publish Kiwi’s web UI port
     volumes:
-      - lounge-data:/var/opt/thelounge
+      - ./config.json:/opt/KiwiIRC/static/config.json:ro  # mount your config
+    environment:
+      - WEBIRCGATEWAY_CONFIG=/opt/KiwiIRC/static/config.json
     labels:
-      # Enable Traefik routing
       - "traefik.enable=true"
-      - "traefik.http.routers.thelounge.rule=Host(`chat.irc.example.com`)"
-      - "traefik.http.routers.thelounge.entrypoints=websecure"
-      - "traefik.http.routers.thelounge.tls.certresolver=letsencrypt"
-      - "traefik.http.services.thelounge.loadbalancer.server.port=9000"
+      - "traefik.http.routers.kiwiirc.rule=Host(`chat.porant.de`)"
+      - "traefik.http.routers.kiwiirc.entrypoints=websecure"
+      - "traefik.http.routers.kiwiirc.tls.certresolver=letsencrypt"
+      - "traefik.http.services.kiwiirc.loadbalancer.server.port=7778"
     networks:
       - dokploy-network
 

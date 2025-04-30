@@ -1,0 +1,16 @@
+{
+    "windowTitle": "Porant IRC",
+    "theme": "Dark",                          
+    "restricted": true,                      
+  
+    "startupOptions": {                      
+      "server": "irc.porant.de",              
+      "port": 6667,                           
+      "tls": false,                           
+      "channel": "#main",                
+      "nick": "Guest%%%"                      
+    },
+  
+    "hideSettings": true                     
+  }
+  
