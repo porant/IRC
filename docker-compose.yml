@@ -26,9 +26,12 @@ services:
     ports:
       - "7778:7778"                       # publish Kiwi’s web UI port
     volumes:
-      - ./config.json:/opt/KiwiIRC/static/config.json:ro  # mount your config
+      - ./config.js:/opt/KiwiIRC/config.js:ro  # mount your config
+    command: >
+      sh -c "rm -rf /opt/KiwiIRC/static/dist &&
+             kiwiirc"
     environment:
-      - WEBIRCGATEWAY_CONFIG=/opt/KiwiIRC/static/config.json
+      - WEBIRCGATEWAY_CONFIG=/opt/KiwiIRC/config.js
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.kiwiirc.rule=Host(`chat.porant.de`)"
