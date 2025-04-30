@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  # IRC server: InspIRCd
+  ircd:
+    image: inspircd/inspircd-docker:latest
+    # Expose the standard IRC port
+    ports:
+      - "6667:6667"
+    # Basic environment customization (network name, admin email, etc.)
+    environment:
+      - INSP_NET_NAME=porant
+      - INSP_ADMIN_NAME=ServerAdmin
+      - INSP_ADMIN_EMAIL=admin@irc.example.com
+      - INSP_ENABLE_DNSBL=no
+    # Persist generated configs across deployments
+    volumes:
+      - ircd-data:/inspircd/conf
+    networks:
+      - dokploy-network
+
+  # Web-based IRC client: The Lounge
+  thelounge:
+    image: ghcr.io/thelounge/thelounge:latest
+    depends_on:
+      - ircd
+    ports:
+      - "9000:9000"
+    volumes:
+      - lounge-data:/var/opt/thelounge
+    labels:
+      # Enable Traefik routing
+      - "traefik.enable=true"
+      - "traefik.http.routers.thelounge.rule=Host(`chat.irc.example.com`)"
+      - "traefik.http.routers.thelounge.entrypoints=websecure"
+      - "traefik.http.routers.thelounge.tls.certresolver=letsencrypt"
+      - "traefik.http.services.thelounge.loadbalancer.server.port=9000"
+    networks:
+      - dokploy-network
+
+networks:
+  # Dokploy will auto-create and attach this external network
+  dokploy-network:
+    external: true
+
+volumes:
+  ircd-data:
+  lounge-data:
