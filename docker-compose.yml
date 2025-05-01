@@ -18,8 +18,8 @@ services:
     depends_on: # Optional but good practice: wait for dumper to potentially run once
       - cert-dumper
 
-  cert-dumper: # *** SERVICE USING CORRECTED IMAGE ***
-    image: snowdns/traefik-cert-dumper:latest # <-- CORRECTED IMAGE NAME
+  cert-dumper: # *** SERVICE USING FULL IMAGE PATH ***
+    image: docker.io/snowdns/traefik-cert-dumper:latest # <-- FULL IMAGE PATH
     container_name: traefik-cert-dumper-irc
     restart: unless-stopped
     volumes:
@@ -28,7 +28,6 @@ services:
       # Mount the volume where PEM files will be written
       - extracted-certs:/output
     # command: ... (optional arguments remain the same if you added them)
-
 volumes:
   inspircd-logs:
   extracted-certs: # *** NEW NAMED VOLUME ***
