@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.8' # Or remove this line
 
 services:
   inspircd:
@@ -9,25 +9,24 @@ services:
       - "6667:6667"
       - "6697:6697"
     volumes:
-      # Existing config mount
       - ./conf:/inspircd/conf
-      # Existing logs mount
       - inspircd-logs:/inspircd/logs
-      # *** NEW: Mount the extracted certs (read-only) ***
-      - extracted-certs:/etc/ssl/ircd:ro
-    depends_on: # Optional but good practice: wait for dumper to potentially run once
-      - cert-dumper
+      - extracted-certs:/etc/ssl/ircd:ro # Mount point for extracted certs
+    depends_on:
+      - cert-dumper # Wait for dumper to start
 
-  cert-dumper: # *** SERVICE USING FULL IMAGE PATH ***
-    image: docker.io/snowdns/traefik-cert-dumper:latest # <-- FULL IMAGE PATH
-    container_name: traefik-cert-dumper-irc
+  cert-dumper: # *** SERVICE USING LOCAL BUILD ***
+    build:
+      context: ./conf # Build context is the conf directory
+      dockerfile: Dockerfile.dumper # Specify our Dockerfile name
+    container_name: local-cert-dumper-irc
     restart: unless-stopped
     volumes:
-      # Mount acme.json from host (path confirmed) READ-ONLY
-      - /etc/dokploy/traefik/dynamic/acme.json:/input/acme.json:ro # Mount to /input/acme.json
+      # Mount acme.json from host READ-ONLY
+      - /etc/dokploy/traefik/dynamic/acme.json:/input/acme.json:ro
       # Mount the volume where PEM files will be written
       - extracted-certs:/output
-    # command: ... (optional arguments remain the same if you added them)
+
 volumes:
   inspircd-logs:
-  extracted-certs: # *** NEW NAMED VOLUME ***
+  extracted-certs:
