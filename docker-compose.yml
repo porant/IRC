@@ -14,7 +14,7 @@ services:
     volumes:
       # Mount the local ./conf directory (from Git repo) into the container
       # This makes your inspircd.conf and other configs available inside
-      - ./conf:/inspircd/conf:ro # Mount as read-only for config safety
+      - ./conf:/inspircd/conf
       # (Optional) Mount a volume for logs for persistence
       # Dokploy might handle log persistence differently, but this is explicit
       # You might need to create a 'logs' directory on the host via Dokploy or manually
