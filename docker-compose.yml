@@ -21,32 +21,26 @@ services:
 
   # Web-based IRC client: Kiwi IRC
   kiwiirc:
-    image: itzg/kiwi-irc:latest
+    image: itzg/kiwi-irc:latest           # official Kiwi IRC image
     ports:
-      - "7778:7778"
+      - "7778:7778"                       # publish Kiwi’s web UI port
     volumes:
-      - ./config.js:/opt/KiwiIRC/config.js:ro
-    command: >
-      sh -c "rm -rf /opt/KiwiIRC/static/dist && kiwiirc"
+      - ./config.js:/opt/KiwiIRC/config.js:ro  # mount your config
     environment:
       - WEBIRCGATEWAY_CONFIG=/opt/KiwiIRC/config.js
     labels:
-      # Enable Traefik for this service
-      - "traefik.enable=true"  
-      # Route HTTPS requests for chat.porant.de to this container
-      - "traefik.http.routers.kiwi.rule=Host(`chat.porant.de`)"  
-      # Use the websecure entrypoint (TLS) defined in your Traefik
-      - "traefik.http.routers.kiwi.entrypoints=websecure"  
-      # Obtain/renew certificates via Let's Encrypt
-      - "traefik.http.routers.kiwi.tls.certresolver=letsencrypt"  
-      # Tell Traefik the container’s internal port to forward to
-      - "traefik.http.services.kiwi.loadbalancer.server.port=7778"  
-      # (Optional) Redirect HTTP → HTTPS
-      - "traefik.http.routers.kiwi-http.rule=Host(`chat.porant.de`)"  
-      - "traefik.http.routers.kiwi-http.entrypoints=web"  
-      - "traefik.http.routers.kiwi-http.middlewares=redirect-to-https@docker"  
-  networks:
-    - dokploy-network
+      - "traefik.enable=true"
+      - "traefik.http.routers.kiwiirc.rule=Host(`chat.porant.de`)"
+      - "traefik.http.routers.kiwiirc.entrypoints=websecure"
+      - "traefik.http.routers.kiwiirc.tls.certresolver=letsencrypt"
+      - "traefik.http.services.kiwiirc.loadbalancer.server.port=7778"
+    networks:
+      - dokploy-network
+
+networks:
+  # Dokploy will auto-create and attach this external network
+  dokploy-network:
+    external: true
 
 volumes:
   ircd-data:
