@@ -18,22 +18,16 @@ services:
     depends_on: # Optional but good practice: wait for dumper to potentially run once
       - cert-dumper
 
-  cert-dumper: # *** NEW SERVICE ***
-    image: ldez/traefik-cert-dumper:latest
-    container_name: traefik-cert-dumper-irc # Specific name
+  cert-dumper: # *** SERVICE USING CORRECTED IMAGE ***
+    image: snowdns/traefik-cert-dumper:latest # <-- CORRECTED IMAGE NAME
+    container_name: traefik-cert-dumper-irc
     restart: unless-stopped
     volumes:
       # Mount acme.json from host (path confirmed) READ-ONLY
       - /etc/dokploy/traefik/dynamic/acme.json:/input/acme.json:ro # Mount to /input/acme.json
       # Mount the volume where PEM files will be written
       - extracted-certs:/output
-    # command: # Optional: Increase wait time if needed
-    #   - dump
-    #   - --watch
-    #   - --source /input/acme.json
-    #   - --dest /output
-    #   - --domain irc.porant.de # Only dump this domain if acme.json has others
-    #   - --wait 300 # Wait 5 minutes between checks
+    # command: ... (optional arguments remain the same if you added them)
 
 volumes:
   inspircd-logs:
