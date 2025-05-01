@@ -1,0 +1,24 @@
+# Use Alpine Linux as the base image (small and we know you can pull it)
+FROM alpine:latest
+
+# Install necessary packages:
+# jq: For parsing the JSON acme.json file
+# bash: Ensure bash shell is available for the script
+# coreutils: Provides tools like stat, chmod
+# openssl: Provides the base64 command (can alternatively use coreutils base64)
+RUN apk update && \
+    apk add --no-cache jq bash coreutils openssl && \
+    rm -rf /var/cache/apk/*
+
+# Create the directories where the script expects input and output files
+# These will be mapped to volumes in docker-compose.yml
+RUN mkdir /input /output
+
+# Copy the dump script from the build context (./conf) into the image
+COPY dump_certs.sh /dump_certs.sh
+
+# Ensure the script is executable inside the image
+RUN chmod +x /dump_certs.sh
+
+# Set the script as the command to run when the container starts
+ENTRYPOINT ["/dump_certs.sh"]
