@@ -1,38 +1,40 @@
-version: '3.8' # Or a version compatible with your Docker/Dokploy setup
+version: '3.8'
 
 services:
   inspircd:
-    image: inspircd/inspircd-docker:latest # Or specify a specific version tag
+    image: inspircd/inspircd-docker:latest # Or pinned version
     container_name: inspircd-server
     restart: unless-stopped
     ports:
-      # Map host port 6667 to container port 6667 (standard IRC)
       - "6667:6667"
-      # Map host port 6697 to container port 6697 (standard IRC over SSL/TLS)
-      # Only include this if you have configured SSL in inspircd.conf
       - "6697:6697"
     volumes:
-      # Mount the local ./conf directory (from Git repo) into the container
-      # This makes your inspircd.conf and other configs available inside
+      # Existing config mount
       - ./conf:/inspircd/conf
-      # (Optional) Mount a volume for logs for persistence
-      # Dokploy might handle log persistence differently, but this is explicit
-      # You might need to create a 'logs' directory on the host via Dokploy or manually
-      # Or use a named volume managed by Docker/Dokploy
+      # Existing logs mount
       - inspircd-logs:/inspircd/logs
-      # (Optional) Mount a volume for potential data/state if needed by modules
-      # - inspircd-data:/inspircd/data
+      # *** NEW: Mount the extracted certs (read-only) ***
+      - extracted-certs:/etc/ssl/ircd:ro
+    depends_on: # Optional but good practice: wait for dumper to potentially run once
+      - cert-dumper
+
+  cert-dumper: # *** NEW SERVICE ***
+    image: ldez/traefik-cert-dumper:latest
+    container_name: traefik-cert-dumper-irc # Specific name
+    restart: unless-stopped
+    volumes:
+      # Mount acme.json from host (path confirmed) READ-ONLY
+      - /etc/dokploy/traefik/dynamic/acme.json:/input/acme.json:ro # Mount to /input/acme.json
+      # Mount the volume where PEM files will be written
+      - extracted-certs:/output
+    # command: # Optional: Increase wait time if needed
+    #   - dump
+    #   - --watch
+    #   - --source /input/acme.json
+    #   - --dest /output
+    #   - --domain irc.porant.de # Only dump this domain if acme.json has others
+    #   - --wait 300 # Wait 5 minutes between checks
 
 volumes:
-  # Define the named volumes used above
   inspircd-logs:
-  # inspircd-data:
-
-# (Optional) Define a network if you want to isolate it
-# networks:
-#   ircnet:
-#     driver: bridge
-
-# If using a custom network, uncomment the following under the inspircd service:
-# networks:
-#   - ircnet
+  extracted-certs: # *** NEW NAMED VOLUME ***
