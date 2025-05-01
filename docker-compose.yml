@@ -1,28 +1,38 @@
-version: "3.8"
+version: '3.8' # Or a version compatible with your Docker/Dokploy setup
 
 services:
-  # IRC server: InspIRCd
-  ircd:
-    image: inspircd/inspircd-docker:latest
-    # Expose the standard IRC port
+  inspircd:
+    image: inspircd/inspircd-docker:latest # Or specify a specific version tag
+    container_name: inspircd-server
+    restart: unless-stopped
     ports:
+      # Map host port 6667 to container port 6667 (standard IRC)
       - "6667:6667"
-    # Basic environment customization (network name, admin email, etc.)
-    environment:
-      - INSP_NET_NAME=porant
-      - INSP_ADMIN_NAME=ServerAdmin
-      - INSP_ADMIN_EMAIL=admin@irc.example.com
-      - INSP_ENABLE_DNSBL=no
-    # Persist generated configs across deployments
+      # Map host port 6697 to container port 6697 (standard IRC over SSL/TLS)
+      # Only include this if you have configured SSL in inspircd.conf
+      - "6697:6697"
     volumes:
-      - ircd-data:/inspircd/conf
-    networks:
-      - dokploy-network
-
-networks:
-  # Dokploy will auto-create and attach this external network
-  dokploy-network:
-    external: true
+      # Mount the local ./conf directory (from Git repo) into the container
+      # This makes your inspircd.conf and other configs available inside
+      - ./conf:/inspircd/conf:ro # Mount as read-only for config safety
+      # (Optional) Mount a volume for logs for persistence
+      # Dokploy might handle log persistence differently, but this is explicit
+      # You might need to create a 'logs' directory on the host via Dokploy or manually
+      # Or use a named volume managed by Docker/Dokploy
+      - inspircd-logs:/inspircd/logs
+      # (Optional) Mount a volume for potential data/state if needed by modules
+      # - inspircd-data:/inspircd/data
 
 volumes:
-  ircd-data:
+  # Define the named volumes used above
+  inspircd-logs:
+  # inspircd-data:
+
+# (Optional) Define a network if you want to isolate it
+# networks:
+#   ircnet:
+#     driver: bridge
+
+# If using a custom network, uncomment the following under the inspircd service:
+# networks:
+#   - ircnet
