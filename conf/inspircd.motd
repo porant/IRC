@@ -1,18 +1,14 @@
-----------------------------------------
-
-              Welcome to:
-         Porant's Chat server
-
-
-----------------------------------------
---< AVAILABLE ROOMS >-------------------
--- [#chat] --> MAIN CHAT
-
---< COMMANDS >--------------------------
--- [/join #room] -- Joins/Creates #room
--- [/part #room] -- Leaves #room
--- [/quit] -- Disconnects from server
--- [/motd] -- Displays this message
--- [/list >0] -- Lists available rooms
-
-----------------------------------------
+<---------------------------------------->
+|                                        |
+|              Welcome to:               |
+|         Porant's IRC server            |
+|                                        |
+<--< AVAILABLE ROOMS >------------------->
+|-- [#chat] --> MAIN CHAT                |
+<--< COMMANDS >-------------------------->
+|-- [/join #room] -- Joins/Creates #room |
+|-- [/part #room] -- Leaves #room        |
+|-- [/quit] -- Disconnects from server   |
+|-- [/motd] -- Displays this message     |
+|-- [/list >0] -- Lists available rooms  |
+<---------------------------------------->
